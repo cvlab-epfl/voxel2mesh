@@ -23,3 +23,26 @@ and refined non-uniformly by adding vertices only where they are needed.
 Fig. 2. Qualitative results. (a) Input volumes. EM (row 1,2), CT(row 3), MRI(row
 4) (b) Ground truth (c) CNN baseline (d) CNN baseline + post processing (e)
 Voxel2Mesh. The orange boxes highlight false positive regions.
+
+
+## Installation
+PyTorch 1.4
+
+Python 3.6.9
+
+## Dataset
+
+&emsp;1. [CHAOS dataset](https://chaos.grand-challenge.org/Download/)  . 
+
+&emsp;2. [Hippocampus dataset](https://drive.google.com/file/d/1RzPB1_bqzQhlWvU-YGvZzhx2omcDh38C/view?usp=sharing)
+
+&emsp;3. Synaptic junction dataset will be made available soon.
+
+## Running experiments
+
+execute : ```python main.py```
+
+This will train voxel2mesh and evaluate every 1000 iterations. All the parameters are listed in ``` config.py```. 
+
+## Contact
+For any questions regard this paper/code, please directly contact [Udaranga Wickramasinghe](mailto:udaranga.wickramasinghe@epfl.ch).
