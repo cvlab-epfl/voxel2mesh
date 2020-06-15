@@ -40,9 +40,11 @@ Python 3.6.9
 
 ## Running experiments
 
-execute : ```python main.py```
+Step 1: Preprocessing the dataset and saving it to disk. You can use ```pre_process_dataset``` function to do that. Uncomment ```pre_process_dataset``` in ```main.py``` and execute ```python main.py```
+Step 2: Once the dataset is ready, comment ```pre_process_dataset``` and uncomment ```quick_load_data``` function in ```main.py```. Then re-execute ```python main.py``` and this will start training the network.
 
-This will train voxel2mesh and evaluate every 1000 iterations. All the parameters are listed in ``` config.py```. 
+This will train voxel2mesh and evaluate every T iterations. All the parameters are listed in ``` config.py```. 
+
 
 ## Contact
 For any questions regard this paper/code, please directly contact [Udaranga Wickramasinghe](mailto:udaranga.wickramasinghe@epfl.ch).
