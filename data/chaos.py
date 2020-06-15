@@ -2,7 +2,7 @@ import numpy as np
 from skimage import io
 from data.data import get_item, sample_outer_surface_in_voxel
 
-
+import sys
 from utils.metrics import jaccard_index, chamfer_weighted_symmetric, chamfer_directed
 from utils.utils_common import crop, DataModes, crop_indices, blend
 # from utils.utils_mesh import sample_outer_surface, get_extremity_landmarks, voxel2mesh, clean_border_pixels, sample_outer_surface_in_voxel, normalize_vertices 
@@ -94,31 +94,33 @@ class Chaos():
     def quick_load_data(self, cfg, trial_id):
         # assert cfg.patch_shape == (64, 256, 256), 'Not supported'
         down_sample_shape = cfg.patch_shape
-        data_root = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/chaos/Train_Sets/CT'
+
+        data_root = cfg.dataset_path
         data = {}
         for i, datamode in enumerate([DataModes.TRAINING, DataModes.TESTING]):
-            with open(data_root + '/pre_loaded_data_{}_{}_v2.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'rb') as handle:
+            with open(data_root + '/pre_loaded_data_{}_{}_v3.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'rb') as handle:
                 samples = pickle.load(handle)
                 new_samples = self.sample_to_sample_plus(samples, cfg, datamode)
                 data[datamode] = ChaosDataset(new_samples, cfg, datamode) 
-        data[DataModes.VALIDATION] = data[DataModes.TESTING] ## <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< switch to testing
+
         return data
 
-    def load_data(self, cfg, trial_id):
+    def pre_process_dataset(self, cfg, trial_id):
         '''
          :
         '''
-
-        data_root = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/chaos/Train_Sets/CT'
+ 
+        data_root = cfg.dataset_path
         samples = [dir for dir in os.listdir(data_root)]
  
         pad_shape = (384, 384, 384)
         inputs = []
         labels = []
 
+        print('Data pre-processing')
         for sample in samples:
             if 'pickle' not in sample:
-                print(sample)
+                print('.', end='', flush=True)
                 x = [] 
                 images_path = [dir for dir in os.listdir('{}/{}/DICOM_anon'.format(data_root, sample)) if 'dcm' in dir]
                 for image_path in images_path:
@@ -129,20 +131,7 @@ class Chaos():
                 h_resolution, w_resolution = file.PixelSpacing 
                 x = np.float32(np.array(x))
 
-                # clip: x 
-                # CHAOS CHALLENGE: MedianCHAOS
-                # Vladimir Groza from Median Technologies: CHAOS 1st place solution overview.
-                # embed()
-                # x[x<(1000-160)] = 1000-160
-                # x[x>(1000+240)] = 1000+240
-                # x = (x - x.min())/(x.max()-x.min())
-
-
-                # io.imsave('/cvlabdata2/cvlab/datasets_udaranga/check1006.tif', np.uint8(x * 255)) 
-                # x = io.imread('{}/{}/DICOM_anon/volume.tif'.format(data_root, sample))
-                # x = np.float32(x)/2500
-                # x[x>1] = 1
-                #
+ 
                 D, H, W = x.shape
                 D = int(D * d_resolution) #  
                 H = int(H * h_resolution) # 
@@ -172,9 +161,8 @@ class Chaos():
                 center_z, center_y, center_x = D // 2, H // 2, W // 2
                 D, H, W = pad_shape
                 x = crop(x, (D, H, W), (center_z, center_y, center_x))  
- 
-                # io.imsave('{}/{}/DICOM_anon/volume_resampled_2.tif'.format(data_root, sample), np.uint16(x))
-                 
+  
+                # normalize x
                 x = (x - mean_x)/std_x
                 x = torch.from_numpy(x)
                 inputs += [x]
@@ -204,7 +192,7 @@ class Chaos():
                   
                 labels += [y]
 
- 
+        print('\nSaving pre-processed data to disk')
         np.random.seed(0)
         perm = np.random.permutation(len(inputs))
         tr_length = cfg.training_set_size
@@ -221,29 +209,27 @@ class Chaos():
         for i, datamode in enumerate([DataModes.TRAINING, DataModes.TESTING]):
 
             samples = []
-            print(i)
-            print('--')
+ 
 
-            for j in counts[i]:
-                print(j)
+            for j in counts[i]: 
+                print('.',end='', flush=True)
                 x = inputs[j]
                 y = labels[j]
 
                 x = F.interpolate(x[None, None], scale_factor=scale_factor, mode='trilinear')[0, 0]
                 y = F.interpolate(y[None, None].float(), scale_factor=scale_factor, mode='nearest')[0, 0].long()
 
-                samples.append(Sample(x, y))
-                # print('A BREAK IS HERE!!!!!!!!!!!!!!!!!!!!!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                # break 
+                samples.append(Sample(x, y)) 
 
-            with open(data_root + '/pre_loaded_data_{}_{}_v2.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'wb') as handle:
+            with open(data_root + '/pre_loaded_data_{}_{}_v3.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'wb') as handle:
                 pickle.dump(samples, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
             data[datamode] = ChaosDataset(samples, cfg, datamode)
-        print('-end-')
-        data[DataModes.TRAINING_EXTENDED] = ChaosDataset(data[DataModes.TRAINING].data, cfg, DataModes.TRAINING_EXTENDED)
-        data[DataModes.VALIDATION] = data[DataModes.TESTING]
-        # raise Exception()
+        
+        print('\n***************************************\n\
+            Pre-processing complete. Now comment function load_data in main.py and uncomment function quick_load_data.\n\
+            ***************************************')
+        sys.exit()
         return data
  
     def evaluate(self, target, pred, cfg):

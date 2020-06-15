@@ -14,9 +14,21 @@ def load_config(exp_id):
     cfg.trial_id = None
  
 
-    ''' Save at '''
-    cfg.save_path = '/your/path/to/experiments/miccai2020/' # results will be saved here
+    ''' 
+    **** Paths *****
+    save_path: results will be saved at this location
+    dataset_path: dataset must be stored here.
 
+    Note: During the first run use load_data function. It will do the necessary preprocessing and save the files at the same location.
+    After that, you can use quick_load_data function to load them. This function is called in main.py
+
+    '''
+
+    cfg.save_path = '/your/path/to/experiments/miccai2020' # results will be saved here
+    cfg.dataset_path = '/your/path/to/dataset'
+
+
+    # example
     cfg.save_dir_prefix = 'Experiment_' # prefix for experiment folder
  
     cfg.name = 'voxel2mesh'
@@ -52,5 +64,8 @@ def load_config(exp_id):
     ''' Training '''
     cfg.numb_of_itrs = 300000
     cfg.eval_every = 1000 # saves results to disk
+
+    # ''' Rreporting '''
+    # cfg.wab = True # use weight and biases for reporting
     
     return cfg

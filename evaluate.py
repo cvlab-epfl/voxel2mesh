@@ -1,7 +1,5 @@
-from utils.utils_common import DataModes, mkdir, blend, crop_indices, blend_cpu, append_line, write_lines
-# from utils.utils_mesh import run_rasterize, save_to_obj, save_to_obj2, clean_border_pixels, voxel2mesh, read_obj
-from utils.utils_voxel2mesh.file_handle import save_to_obj 
-from utils.utils_voxel2mesh.rasterize import run_rasterize 
+from utils.utils_common import DataModes, mkdir, blend, crop_indices, blend_cpu, append_line, write_lines 
+from utils.utils_voxel2mesh.file_handle import save_to_obj  
 from torch.utils.data import DataLoader
 import numpy as np
 import torch
@@ -12,6 +10,7 @@ import os
 from scipy import ndimage
 from IPython import embed
 import wandb
+from utils.rasterize.rasterize import Rasterize
 # from utils import stns
 
 
@@ -114,15 +113,10 @@ class Evaluator(object):
                 true_points += [data['surface_points'][c].data.cpu()]
 
                 _, _, D, H, W = x.shape
-                # embed()
-                v = torch.tensor([D-1, H-1, W-1])[None].float() * (torch.flip(pred_vertices[0].clone(), [1]) + 1)/2 
-                v = torch.round(v).data.cpu().numpy() 
-
-                f = pred_faces[0].clone().numpy()
-                y_voxels_i = run_rasterize(v * 0, f, grid_size=(D, H, W))
-                y_voxels_i = run_rasterize(v, f, grid_size=(D, H, W))
-  
-                pred_voxels_rasterized = torch.from_numpy(y_voxels_i).long()[None] / 255
+                shape = torch.tensor([D,H,W]).int().cuda()
+                rasterizer = Rasterize(shape)
+                pred_voxels_rasterized = rasterizer(pred_vertices, pred_faces).long()
+                 
                 pred_voxels[pred_voxels_rasterized==1] = c + 1
 
             true_voxels = data['y_voxels'].data.cpu() 

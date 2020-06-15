@@ -64,6 +64,7 @@ def main():
     classifier = network(cfg)
     classifier.cuda()
  
+
     wandb.init(name='Experiment_{}/trial_{}'.format(cfg.experiment_idx, trial_id), project="vm-net", dir='/cvlabdata1/cvlab/datasets_udaranga/experiments/wanb')
  
     print("Initialize optimizer")
@@ -71,7 +72,11 @@ def main():
   
     print("Load data") 
     data_obj = Chaos()
+
+    # During the first run use load_data function. It will do the necessary preprocessing and save the files to disk.
+    # data = data_obj.pre_process_dataset(cfg, trial_id)
     data = data_obj.quick_load_data(cfg, trial_id)
+    
     loader = DataLoader(data[DataModes.TRAINING], batch_size=classifier.config.batch_size, shuffle=True)
   
     print("Trainset length: {}".format(loader.__len__()))
@@ -94,6 +99,9 @@ def main():
 
 
     trainer.train(start_iteration=epoch) 
+
+    # To evaluate a pretrained model, uncomment line below and comment the line above
+    # evaluator.evaluate(epoch)
 
 if __name__ == "__main__": 
     main()

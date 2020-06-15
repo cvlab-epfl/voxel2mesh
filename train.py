@@ -63,7 +63,7 @@ class Trainer(object):
                     for key, value in loss.items():
                         log_vals[key] = value / print_every 
                     log_vals['iteration'] = iteration 
-                    wandb.log(log_vals)  
+ 
   
 
                 iteration = iteration + 1 
