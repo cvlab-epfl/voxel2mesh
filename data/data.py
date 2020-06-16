@@ -117,7 +117,7 @@ def get_item(item, mode, config):
         return {   'x': x,  
                    'y_voxels': y, 
                    'surface_points': surface_points_normalized_all, 
-                   'unpool':[1, 0, 1, 0, 0]
+                   'unpool':[0, 1, 0, 1, 0]
                 }
     else:
         return {   'x': x, 
@@ -125,7 +125,7 @@ def get_item(item, mode, config):
                    'vertices_mc': vertices_mc_all,
                    'faces_mc': faces_mc_all,
                    'surface_points': surface_points_normalized_all, 
-                   'unpool':[1, 1, 1, 0, 0]}
+                   'unpool':[0, 1, 1, 1, 1]}
 
 def sample_outer_surface_in_voxel(volume): 
     # inner surface

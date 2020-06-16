@@ -1,4 +1,4 @@
-''' Dataset '''
+ 
 import os
 GPU_index = "0"
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_index
@@ -49,8 +49,7 @@ def init(cfg):
     return trial_save_path, trial_id
 
 def main():
-
-    # from models.unet import UNet as network
+ 
     from models.voxel2mesh import Voxel2Mesh as network
     exp_id = 2
 

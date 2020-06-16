@@ -95,7 +95,7 @@ def adoptive_unpool(vertices, faces_prev, sphere_vertices, latent_features, N_pr
     dist[cond2 < 0] = norm2[cond2 < 0]
 
     sorted_, _ = torch.sort(dist)
-    threshold = sorted_[int(0.25*len(sorted_))] 
+    threshold = sorted_[int(0.3*len(sorted_))] 
 
     vertices_needed = vertices_secondary[dist > threshold]
     
