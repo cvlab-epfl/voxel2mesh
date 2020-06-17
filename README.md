@@ -40,10 +40,10 @@ Python 3.6.9
 
 ## Running experiments
 
-&emsp; Step 1: Preprocessing the dataset and saving it to disk. You can use ```pre_process_dataset``` function to do that. Uncomment ```pre_process_dataset``` in ```main.py``` and execute ```python main.py```
+&emsp; Step 1: First, it's recommended to do necessary preprocessing and saving the data to disk. You can use ```pre_process_dataset``` function to do that. Uncomment ```pre_process_dataset``` in ```main.py``` and execute ```python main.py```
 
 &emsp; Step 2: Once the dataset is ready, comment ```pre_process_dataset``` and uncomment ```quick_load_data``` function in ```main.py```. Then re-execute ```python main.py``` and this will start training the network. All the parameters used in the training are listed in ``` config.py```. 
-
+ 
 
 ## Contact
 For any questions regard this paper/code, please directly contact [Udaranga Wickramasinghe](mailto:udaranga.wickramasinghe@epfl.ch).
