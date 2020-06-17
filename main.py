@@ -50,7 +50,7 @@ def init(cfg):
 
 def main():
  
-    from models.voxel2mesh import Voxel2Mesh as network
+    from model.voxel2mesh import Voxel2Mesh as network
     exp_id = 2
 
     # Initialize
