@@ -24,13 +24,13 @@ def load_config(exp_id):
 
     '''
 
-    cfg.save_path = '/your/path/to/experiments/miccai2020/' # results will be saved here
-    cfg.dataset_path = '/your/path/to/dataset'
+    # cfg.save_path = '/your/path/to/experiments/miccai2020/' # results will be saved here
+    # cfg.dataset_path = '/your/path/to/dataset'
 
 
     # example
-    # cfg.dataset_path = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/chaos/Train_Sets/CT'
-    # cfg.save_path = '/cvlabdata2/cvlab/datasets_udaranga/experiments/vmnet/'
+    cfg.dataset_path = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/chaos/Train_Sets/CT'
+    cfg.save_path = '/cvlabdata2/cvlab/datasets_udaranga/experiments/vmnet/'
     cfg.save_dir_prefix = 'Experiment_' # prefix for experiment folder
  
     cfg.name = 'voxel2mesh'
