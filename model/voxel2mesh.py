@@ -176,8 +176,9 @@ class Voxel2Mesh(nn.Module):
                 deltaV = feature2vertex(latent_features, A, D, vertices, faces)
                 vertices = vertices + deltaV 
                 
-                # Discard the vertices that were introduced from the uniform unpool and didn't deform much
-                vertices, faces, latent_features, sphere_vertices = adoptive_unpool(vertices, faces_prev, sphere_vertices, latent_features, N_prev)
+                if do_unpool[0] == 1:
+                    # Discard the vertices that were introduced from the uniform unpool and didn't deform much
+                    vertices, faces, latent_features, sphere_vertices = adoptive_unpool(vertices, faces_prev, sphere_vertices, latent_features, N_prev)
 
                 voxel_pred = self.final_layer(x) if i == len(self.up_std_conv_layers)-1 else None
 
