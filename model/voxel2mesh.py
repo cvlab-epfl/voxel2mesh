@@ -165,7 +165,6 @@ class Voxel2Mesh(nn.Module):
                     latent_features, _ = uniform_unpool(latent_features, faces)  
                     sphere_vertices, _ = uniform_unpool(sphere_vertices, faces) 
                     faces = faces_  
-                    vertices, faces, latent_features, sphere_vertices = adoptive_unpool(vertices, faces_prev, sphere_vertices, latent_features, N_prev)
 
                 
                 A, D = adjacency_matrix(vertices, faces)
@@ -176,7 +175,10 @@ class Voxel2Mesh(nn.Module):
                 latent_features = graph_unet_layer(latent_features, A, D, vertices, faces)
                 deltaV = feature2vertex(latent_features, A, D, vertices, faces)
                 vertices = vertices + deltaV 
- 
+                
+                # Discard the vertices that were introduced from the uniform unpool and didn't deform much
+                vertices, faces, latent_features, sphere_vertices = adoptive_unpool(vertices, faces_prev, sphere_vertices, latent_features, N_prev)
+
                 voxel_pred = self.final_layer(x) if i == len(self.up_std_conv_layers)-1 else None
 
                 pred[k] += [[vertices, faces, latent_features, voxel_pred, sphere_vertices]]
