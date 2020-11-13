@@ -36,7 +36,7 @@ Python 3.6.9
 
 &emsp;2. [Hippocampus dataset](https://drive.google.com/file/d/1RzPB1_bqzQhlWvU-YGvZzhx2omcDh38C/view?usp=sharing)
 
-&emsp;3. Synaptic junction dataset will be made available soon.
+&emsp;3. [Synaptic junction dataset](https://drive.google.com/drive/folders/1CVPLnfOdt_3x0bioFWva4VENk2bjgbri?usp=sharing).
 
 ## Running experiments
 
