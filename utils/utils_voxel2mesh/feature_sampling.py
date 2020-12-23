@@ -143,7 +143,7 @@ class BasicSkipConnection(nn.Module):
     def forward(self, voxel_features, vertices):
         
         neighbourhood = vertices[:, :, None, None]  
-        features = F.grid_sample(voxel_features, neighbourhood, mode='bilinear', padding_mode='border')
+        features = F.grid_sample(voxel_features, neighbourhood, mode='bilinear', padding_mode='border', align_corners=True)
         features = features[:, :, :, 0, 0].transpose(2, 1)
 
         # features = self.sum_neighbourhood(features)[:, :, :, 0].transpose(2, 1)

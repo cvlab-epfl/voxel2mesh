@@ -1,6 +1,6 @@
 import numpy as np
 from skimage import io
-from data.data import get_item, sample_outer_surface_in_voxel
+from data.data import get_item, sample_outer_surface_in_voxel, sample_to_sample_plus
 
 import sys
 from utils.metrics import jaccard_index, chamfer_weighted_symmetric, chamfer_directed
@@ -40,8 +40,7 @@ class SamplePlus:
 class ChaosDataset():
 
     def __init__(self, data, cfg, mode): 
-        self.data = data 
-        # self.data = [data[0]] # <<<<<<<<<<<<<<<
+        self.data = data  
 
         self.cfg = cfg
         self.mode = mode
@@ -60,27 +59,7 @@ class ChaosDataset():
 class Chaos():
 
 
-    def sample_to_sample_plus(self, samples, cfg, datamode):
 
-        new_samples = []
-        # surface_point_count = 100
-        for sample in samples: 
-             
-            x = sample.x
-            y = sample.y 
-  
-            y = (y>0).long()
- 
-            center = tuple([d // 2 for d in x.shape]) 
-            x = crop(x, cfg.patch_shape, center) 
-            y = crop(y, cfg.patch_shape, center)   
-
-            shape = torch.tensor(y.shape)[None].float()
-            y_outer = sample_outer_surface_in_voxel(y) 
-   
-            new_samples += [SamplePlus(x.cpu(), y.cpu(), y_outer.cpu(), shape=shape)]
-
-        return new_samples
 
     def pick_surface_points(self, y_outer, point_count):
         idxs = torch.nonzero(y_outer) 
@@ -98,14 +77,14 @@ class Chaos():
         data_root = cfg.dataset_path
         data = {}
         for i, datamode in enumerate([DataModes.TRAINING, DataModes.TESTING]):
-            with open(data_root + '/pre_loaded_data_{}_{}_v3.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'rb') as handle:
+            with open(data_root + '/pre_computed_data_{}_{}.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'rb') as handle:
                 samples = pickle.load(handle)
-                new_samples = self.sample_to_sample_plus(samples, cfg, datamode)
+                new_samples = sample_to_sample_plus(samples, cfg, datamode)
                 data[datamode] = ChaosDataset(new_samples, cfg, datamode) 
 
         return data
 
-    def pre_process_dataset(self, cfg, trial_id):
+    def pre_process_dataset(self, cfg):
         '''
          :
         '''
@@ -117,7 +96,7 @@ class Chaos():
         inputs = []
         labels = []
 
-        print('Data pre-processing')
+        print('Data pre-processing - Chaos Dataset')
         for sample in samples:
             if 'pickle' not in sample:
                 print('.', end='', flush=True)
@@ -149,7 +128,7 @@ class Chaos():
                  
                 
                 x = torch.from_numpy(x).cuda()
-                x = F.grid_sample(x[None, None], grid, mode='bilinear', padding_mode='border')[0, 0]
+                x = F.grid_sample(x[None, None], grid, mode='bilinear', padding_mode='border', align_corners=True)[0, 0]
                 x = x.data.cpu().numpy() 
                 #----
                  
@@ -179,7 +158,7 @@ class Chaos():
                 y = np.int64(y) 
 
                 y = torch.from_numpy(y).cuda()
-                y = F.grid_sample(y[None, None].float(), grid, mode='nearest', padding_mode='border')[0, 0]
+                y = F.grid_sample(y[None, None].float(), grid, mode='nearest', padding_mode='border', align_corners=True)[0, 0]
                 y = y.data.cpu().numpy()
 
                  
@@ -194,12 +173,9 @@ class Chaos():
 
         print('\nSaving pre-processed data to disk')
         np.random.seed(0)
-        perm = np.random.permutation(len(inputs))
-        tr_length = cfg.training_set_size
-        counts = [perm[:tr_length], perm[len(inputs)//2:]]
-        # counts = [perm[:tr_length], perm[16:]]
-
-
+        perm = np.random.permutation(len(inputs)) 
+        counts = [perm[:len(inputs)//2], perm[len(inputs)//2:]]
+ 
         data = {}
         down_sample_shape = cfg.patch_shape
 
@@ -221,15 +197,12 @@ class Chaos():
 
                 samples.append(Sample(x, y)) 
 
-            with open(data_root + '/pre_loaded_data_{}_{}_v3.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'wb') as handle:
+            with open(data_root + '/pre_computed_data_{}_{}.pickle'.format(datamode, "_".join(map(str, down_sample_shape))), 'wb') as handle:
                 pickle.dump(samples, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
             data[datamode] = ChaosDataset(samples, cfg, datamode)
         
-        print('\n***************************************\n\
-            Pre-processing complete. Now comment function load_data in main.py and uncomment function quick_load_data.\n\
-            ***************************************')
-        sys.exit()
+        print('Pre-processing complete') 
         return data
  
     def evaluate(self, target, pred, cfg):

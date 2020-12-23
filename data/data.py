@@ -1,7 +1,7 @@
-from utils.utils_common import DataModes
+from utils.utils_common import DataModes, crop
 from utils import stns
 from skimage import measure
-
+ 
 import torch
 import torch.nn.functional as F
 # from utils import stns
@@ -150,7 +150,27 @@ def normalize_vertices(vertices, shape):
 
     return 2*(vertices/(torch.max(shape)-1) - 0.5)
 
+def sample_to_sample_plus(samples, cfg, datamode):
 
+    new_samples = []
+    # surface_point_count = 100
+    for sample in samples: 
+         
+        x = sample.x
+        y = sample.y 
+
+        y = (y>0).long()
+
+        center = tuple([d // 2 for d in x.shape]) 
+        x = crop(x, cfg.patch_shape, center) 
+        y = crop(y, cfg.patch_shape, center)   
+
+        shape = torch.tensor(y.shape)[None].float()
+        y_outer = sample_outer_surface_in_voxel(y) 
+
+        new_samples += [SamplePlus(x.cpu(), y.cpu(), y_outer.cpu(), shape=shape)]
+
+    return new_samples
 
 def voxel2mesh(volume, gap, shape):
     '''
@@ -183,5 +203,7 @@ def clean_border_pixels(image, gap):
     y_[:, :, W - gap] = 0;
 
     return y_
+
+
 
  

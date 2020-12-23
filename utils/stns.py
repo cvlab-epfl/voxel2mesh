@@ -78,13 +78,13 @@ def transform(theta, x, y=None, w=None, w2=None):
     grid = affine_3d_grid_generator.affine_grid(theta, x[None].shape)
     if x.device.type == 'cuda':
         grid = grid.cuda()
-    x = F.grid_sample(x[None], grid, mode='bilinear', padding_mode='zeros', align_corners=False)[0]
+    x = F.grid_sample(x[None], grid, mode='bilinear', padding_mode='zeros', align_corners=True)[0]
     if y is not None:
-        y = F.grid_sample(y[None, None].float(), grid, mode='nearest', padding_mode='zeros', align_corners=False).long()[0, 0]
+        y = F.grid_sample(y[None, None].float(), grid, mode='nearest', padding_mode='zeros', align_corners=True).long()[0, 0]
     else:
         return x 
     if w is not None: 
-        w = F.grid_sample(w[None, None].float(), grid, mode='nearest', padding_mode='zeros', align_corners=False).long()[0, 0] 
+        w = F.grid_sample(w[None, None].float(), grid, mode='nearest', padding_mode='zeros', align_corners=True).long()[0, 0] 
         return x, y, w
     else:
         return x, y

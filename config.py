@@ -1,6 +1,9 @@
 import numpy as np
 import torch 
 
+from data.chaos import Chaos
+from data.hippocampus import Hippocampus
+
 class Config():
     def __init__(self):
         super(Config, self).__init__()
@@ -12,33 +15,45 @@ def load_config(exp_id):
     ''' Experiment '''
     cfg.experiment_idx = exp_id 
     cfg.trial_id = None
- 
+    
+    cfg.save_dir_prefix = 'Experiment_' # prefix for experiment folder
+    cfg.name = 'voxel2mesh'
 
     ''' 
-    **** Paths *****
+    **************************************** Paths ****************************************
     save_path: results will be saved at this location
     dataset_path: dataset must be stored here.
-
-    Note: During the first run use load_data function. It will do the necessary preprocessing and save the files at the same location.
-    After that, you can use quick_load_data function to load them. This function is called in main.py
-
     '''
-
+    cfg.save_path = None    # UPDATE HERE <<<<<<<<<<<<<<<<<<<<<<
+    cfg.dataset_path = None # UPDATE HERE <<<<<<<<<<<<<<<<<<<<<<
+    
     # cfg.save_path = '/your/path/to/experiments/miccai2020/' # results will be saved here
-    # cfg.dataset_path = '/your/path/to/dataset'
+    # cfg.dataset_path = '/your/path/to/dataset' # path to the dataset
+
+    # Initialize data object for. 
+    # Hippocampus() for hippocampus and Chaos() for liver dataset. 
+
+    cfg.data_obj = None     # UPDATE HERE <<<<<<<<<<<<<<<<<<<<<<
+    # cfg.data_obj = Chaos() 
+    # cfg.data_obj = Hippocampus()
 
 
     # example
     cfg.dataset_path = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/chaos/Train_Sets/CT'
+    # cfg.dataset_path = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/Task04_Hippocampus'
+    cfg.data_obj = Chaos()
+    # cfg.data_obj = Hippocampus()
+
     cfg.save_path = '/cvlabdata2/cvlab/datasets_udaranga/experiments/vmnet/'
-    cfg.save_dir_prefix = 'Experiment_' # prefix for experiment folder
- 
-    cfg.name = 'voxel2mesh'
-   
 
-    ''' Dataset ''' 
-    cfg.training_set_size = 10  
+    ''' 
+    ************************************************************************************************
+    ''' 
 
+
+
+
+    ''' Dataset '''  
     # input should be cubic. Otherwise, input should be padded accordingly.
     cfg.patch_shape = (64, 64, 64) 
     

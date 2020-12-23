@@ -9,7 +9,9 @@ import torch
 import numpy as np
 from train import Trainer
 from evaluate import Evaluator  
-from data.chaos import Chaos
+
+
+
 from shutil import copytree, ignore_patterns
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -19,7 +21,7 @@ from IPython import embed
 from utils.utils_common import mkdir
 
 from config import load_config
-
+from model.voxel2mesh import Voxel2Mesh as network
 
 
 
@@ -50,8 +52,8 @@ def init(cfg):
 
 def main():
  
-    from model.voxel2mesh import Voxel2Mesh as network
-    exp_id = 2
+    
+    exp_id = 3
 
     # Initialize
     cfg = load_config(exp_id)
@@ -64,16 +66,13 @@ def main():
     classifier.cuda()
  
 
-    wandb.init(name='Experiment_{}/trial_{}'.format(cfg.experiment_idx, trial_id), project="vm-net", dir='/cvlabdata1/cvlab/datasets_udaranga/experiments/wanb')
+    wandb.init(name='Experiment_{}/trial_{}'.format(cfg.experiment_idx, trial_id), project="vm-net", dir=trial_path)
  
     print("Initialize optimizer")
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, classifier.parameters()), lr=cfg.learning_rate)  
   
-    print("Load data") 
-    data_obj = Chaos()
-
-    # During the first run use load_data function. It will do the necessary preprocessing and save the files to disk.
-    # data = data_obj.pre_process_dataset(cfg, trial_id)
+    print("Load pre-processed data") 
+    data_obj = cfg.data_obj 
     data = data_obj.quick_load_data(cfg, trial_id)
     
     loader = DataLoader(data[DataModes.TRAINING], batch_size=classifier.config.batch_size, shuffle=True)
