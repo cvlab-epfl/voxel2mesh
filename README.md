@@ -46,5 +46,20 @@ Python 3.6.9
 
 &emsp; Step 3: Now execute ```python main.py``` and this will start training the network. 
 
+## Citation
+If you find Voxel2Mesh useful, please cite the [MICCAI article](https://link.springer.com/chapter/10.1007/978-3-030-59719-1_30)
+```
+@InProceedings{10.1007/978-3-030-59719-1_30,
+author="Wickramasinghe, Udaranga and Remelli, Edoardo and Knott, Graham and Fua, Pascal",
+title="Voxel2Mesh: 3D Mesh Model Generation from Volumetric Data",
+booktitle="Medical Image Computing and Computer Assisted Intervention -- MICCAI 2020",
+year="2020",
+publisher="Springer International Publishing",
+address="Cham",
+pages="299--308", 
+isbn="978-3-030-59719-1"
+}```
+
 ## Contact
 For any questions regard this paper/code, please directly contact [Udaranga Wickramasinghe](mailto:udaranga.wickramasinghe@epfl.ch).
+
