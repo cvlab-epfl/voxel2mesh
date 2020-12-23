@@ -38,13 +38,9 @@ def load_config(exp_id):
     # cfg.data_obj = Hippocampus()
 
 
-    # example
-    cfg.dataset_path = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/chaos/Train_Sets/CT'
-    # cfg.dataset_path = '/cvlabsrc1/cvlab/datasets_udaranga/datasets/3d/Task04_Hippocampus'
-    cfg.data_obj = Chaos()
-    # cfg.data_obj = Hippocampus()
-
-    cfg.save_path = '/cvlabdata2/cvlab/datasets_udaranga/experiments/vmnet/'
+    assert cfg.save_path != None, "Set cfg.save_path in config.py"
+    assert cfg.dataset_path != None, "Set cfg.dataset_path in config.py"
+    assert cfg.data_obj != None, "Set cfg.data_obj in config.py"
 
     ''' 
     ************************************************************************************************
