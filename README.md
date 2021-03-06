@@ -38,7 +38,7 @@ Python 3.6.9
 
 &emsp;3. [Synaptic junction dataset](https://drive.google.com/drive/folders/1CVPLnfOdt_3x0bioFWva4VENk2bjgbri?usp=sharing).
 
-## Running experiments
+## Running Experiments
 
 &emsp; Step 1: Update config.py. You need to set the path to the dataset and also the directory to save the results.
 
