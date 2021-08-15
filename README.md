@@ -48,11 +48,11 @@ Python 3.6.9
 
 ## Known Issues
 
-#### GPU Memory 
+#### GPU memory limitations
 For our experiments, we used a GPU with 32GB of memory. If you are using a GPU with memory less than 20GB, you might run out of GPU memory during evaluation stage since we use higher number of vertices at this stage. To reduce the number of vertices during evaluation stage, you can reduce the number of mesh unpoolings (sub-divisions) specified at line 128 in data.py. For instance you can change ```'unpool':[0, 1, 1, 1, 1]``` to ```'unpool':[0, 1, 0, 1, 1]``` or ```'unpool':[0, 1, 0, 1, 0]```
 
 #### Order of slices in loaded image stacks
-In some systems, order of the slices in the loaded image stack can be shuffled. This issue was first reported by Patrick Jenson and he propose a solution as well [here](https://github.com/cvlab-epfl/voxel2mesh/issues/3) 
+In some systems, order of the slices in the loaded image stack can be shuffled. This issue was first reported by Patrick Jenson and he proposed a solution [here](https://github.com/cvlab-epfl/voxel2mesh/issues/3) 
 
 ## Citation
 If you find Voxel2Mesh useful, please cite the [MICCAI article](https://link.springer.com/chapter/10.1007/978-3-030-59719-1_30)
