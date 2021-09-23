@@ -54,6 +54,9 @@ For our experiments, we used a GPU with 32GB of memory. If you are using a GPU w
 #### Order of slices in loaded image stacks
 In some systems, order of the slices in the loaded image stack can be shuffled. This issue was first reported by Patrick Jenson and he proposed a solution [here](https://github.com/cvlab-epfl/voxel2mesh/issues/3) 
 
+#### Missing faces on output mesh
+This happens due to the vertex order in the face matrix. In the meshes produced by Voxel2Mesh, some faces have vertices in clockwise direction and others have them in anti-clockwise direciton. This could be easily fixed by setting the 'back-face' color of the faces in your mesh viewer same as the 'front-face' color OR by writing a function to correct the orientations of the faces. 
+
 ## Citation
 If you find Voxel2Mesh useful, please cite the [MICCAI article](https://link.springer.com/chapter/10.1007/978-3-030-59719-1_30)
 ```
