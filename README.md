@@ -73,5 +73,5 @@ isbn="978-3-030-59719-1"
 ```
 
 ## Contact
-For any questions regard this paper/code, please directly contact [Udaranga Wickramasinghe](mailto:udaranga.wickramasinghe@epfl.ch).
+For any questions regard this paper/code, please directly contact [Udaranga Wickramasinghe](mailto:udaranga@gmail.com).
 
