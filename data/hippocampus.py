@@ -21,6 +21,9 @@ from scipy import ndimage
 import os
 import h5py
 import sys
+import nibabel as nib
+from tqdm import tqdm
+
 
 class Sample:
     def __init__(self, x, y, atlas):
@@ -72,7 +75,7 @@ class Hippocampus(DatasetAndSupport):
         data_root = cfg.dataset_path
         down_sample_shape = cfg.patch_shape  # (224, 224, 224)
         largest_image_size = (64, 64, 64)
-        # data = self.load_nii(data_root, cfg, HippocampusDataset, down_sample_shape, largest_image_size)
+        dataset_init(data_root, None)
 
         samples = [dir for dir in os.listdir('{}/imagesTr'.format(data_root))]
 
@@ -188,3 +191,55 @@ class Hippocampus(DatasetAndSupport):
         y = F.interpolate(y[None, None].float(), out_shape, mode='nearest')[0, 0].long()
 
         return x, y
+    
+def dataset_init(data_root, multi_stack=None):
+    # multi_stack: if image (x) is 4-dim, (i.e. same file has multiple image volumes, you should specify the index of the volume to be used.
+    samples = [dir for dir in os.listdir('{}/imagesTr'.format(data_root))]
+
+    inputs = []
+    labels = []
+    real_sizes = []
+    file_names = []
+
+    vals = []
+    sizes = [] 
+
+    count = 0
+    for itr, sample in enumerate(tqdm(samples)):
+        if '.nii.gz' in sample and '._' not in sample and '.npy' not in sample and '.tif' not in sample:
+
+            x = nib.load('{}/imagesTr/{}'.format(data_root, sample))
+            y = nib.load('{}/labelsTr/{}'.format(data_root, sample)).get_fdata() > 0
+            resolution = np.diag(x.header.get_sform())[:3]
+            x = x.get_fdata()
+            if multi_stack is not None:
+                x = x[:, :, :, multi_stack]
+            real_size = np.round(np.array(x.shape) * resolution)
+            
+            file_name = sample
+
+
+            x = torch.from_numpy(x).permute([2, 1, 0]).cuda().float()
+            y = torch.from_numpy(y).permute([2, 1, 0]).cuda().float()
+            #
+            W, H, D = real_size
+            W, H, D = int(W), int(H), int(D)
+            base_grid = torch.zeros((1, D, H, W, 3))
+            w_points = (torch.linspace(-1, 1, W) if W > 1 else torch.Tensor([-1]))
+            h_points = (torch.linspace(-1, 1, H) if H > 1 else torch.Tensor([-1])).unsqueeze(-1)
+            d_points = (torch.linspace(-1, 1, D) if D > 1 else torch.Tensor([-1])).unsqueeze(-1).unsqueeze(-1)
+            base_grid[:, :, :, :, 0] = w_points
+            base_grid[:, :, :, :, 1] = h_points
+            base_grid[:, :, :, :, 2] = d_points
+            grid = base_grid.cuda()
+
+
+            x = F.grid_sample(x[None, None], grid, mode='bilinear', padding_mode='border')[0, 0].cpu().numpy()
+            y = F.grid_sample(y[None, None], grid, mode='nearest', padding_mode='border')[0, 0].long().cpu().numpy()
+
+
+            x = (x - np.mean(x))/np.std(x) 
+            np.save('{}/imagesTr/p{}'.format(data_root, file_name), x)
+            np.save('{}/labelsTr/p{}'.format(data_root, file_name), y)
+
+            count += 1 
